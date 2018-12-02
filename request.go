@@ -3,18 +3,17 @@ package gateway
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
-	"github.com/aws/aws-lambda-go/events"
+	"github.com/getas/alb-gateway/events"
 	"github.com/pkg/errors"
 )
 
 // NewRequest returns a new http.Request from the given Lambda event.
-func NewRequest(ctx context.Context, e events.APIGatewayProxyRequest) (*http.Request, error) {
+func NewRequest(ctx context.Context, e events.LambdaTargetGroupRequest) (*http.Request, error) {
 	// path
 	u, err := url.Parse(e.Path)
 	if err != nil {
@@ -45,9 +44,9 @@ func NewRequest(ctx context.Context, e events.APIGatewayProxyRequest) (*http.Req
 	}
 
 	// remote addr
-	req.RemoteAddr = e.RequestContext.Identity.SourceIP
+	req.RemoteAddr = e.Headers["x-forwarded-for"]
 
-	// header fields
+	// header fields - including x-amzn-trace-id
 	for k, v := range e.Headers {
 		req.Header.Set(k, v)
 	}
@@ -57,17 +56,8 @@ func NewRequest(ctx context.Context, e events.APIGatewayProxyRequest) (*http.Req
 		req.Header.Set("Content-Length", strconv.Itoa(len(body)))
 	}
 
-	// custom fields
-	req.Header.Set("X-Request-Id", e.RequestContext.RequestID)
-	req.Header.Set("X-Stage", e.RequestContext.Stage)
-
 	// custom context values
 	req = req.WithContext(newContext(ctx, e))
-
-	// xray support
-	if traceID := ctx.Value("x-amzn-trace-id"); traceID != nil {
-		req.Header.Set("X-Amzn-Trace-Id", fmt.Sprintf("%v", traceID))
-	}
 
 	// host
 	req.URL.Host = req.Header.Get("Host")

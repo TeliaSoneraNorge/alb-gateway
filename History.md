@@ -1,5 +1,6 @@
 
-v1.1.1 / 2018-08-17
+v1.0.0 / 2018-12-06
 ===================
 
-  * fix passing of request context
+  * forked from https://github.com/apex/gateway
+  * rewrite to allow requests from an ALB Lambda target group 

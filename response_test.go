@@ -19,6 +19,10 @@ func Test_XML_isTextMime(t *testing.T) {
 	assert.Equal(t, isTextMime("ApPlicaTion/xMl"), true)
 }
 
+func Test_XML_isNotTextMime(t *testing.T) {
+	assert.Equal(t, isTextMime("image/jpeg"), false)
+}
+
 func TestResponseWriter_Header(t *testing.T) {
 	w := NewResponse()
 	w.Header().Set("Foo", "bar")
@@ -66,6 +70,7 @@ func TestResponseWriter_Write_binary(t *testing.T) {
 	assert.Equal(t, 200, e.StatusCode)
 	assert.Equal(t, "ZGF0YQ==", e.Body)
 	assert.Equal(t, "image/png", e.Headers["Content-Type"])
+	assert.Equal(t, "200 OK", e.StatusDescription)
 	assert.True(t, e.IsBase64Encoded)
 }
 

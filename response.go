@@ -3,17 +3,17 @@ package gateway
 import (
 	"bytes"
 	"encoding/base64"
+	"github.com/getas/alb-gateway/events"
 	"mime"
 	"net/http"
+	"strconv"
 	"strings"
-
-	"github.com/aws/aws-lambda-go/events"
 )
 
 // ResponseWriter implements the http.ResponseWriter interface
 // in order to support the API Gateway Lambda HTTP "protocol".
 type ResponseWriter struct {
-	out           events.APIGatewayProxyResponse
+	out           events.LambdaTargetGroupResponse
 	buf           bytes.Buffer
 	header        http.Header
 	wroteHeader   bool
@@ -56,6 +56,7 @@ func (w *ResponseWriter) WriteHeader(status int) {
 	}
 
 	w.out.StatusCode = status
+	w.out.StatusDescription = strconv.Itoa(status) + " " + http.StatusText(status)
 
 	h := make(map[string]string)
 
@@ -75,7 +76,7 @@ func (w *ResponseWriter) CloseNotify() <-chan bool {
 }
 
 // End the request.
-func (w *ResponseWriter) End() events.APIGatewayProxyResponse {
+func (w *ResponseWriter) End() events.LambdaTargetGroupResponse {
 	w.out.IsBase64Encoded = isBinary(w.header)
 
 	if w.out.IsBase64Encoded {

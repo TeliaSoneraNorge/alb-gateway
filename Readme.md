@@ -1,6 +1,7 @@
-<img src="http://tjholowaychuk.com:6000/svg/title/APEX/GATEWAY">
+Package alb-gateway is based on a fork of [Apex/gateway](https://github.com/apex/gateway)
 
-Package gateway provides a drop-in replacement for net/http's `ListenAndServe` for use in AWS Lambda & API Gateway, simply swap it out for `gateway.ListenAndServe`. Extracted from [Up](https://github.com/apex/up) which provides additional middleware features and operational functionality.
+This package provides a drop-in replacement for net/http's `ListenAndServe` for use in an AWS Lambda invoked by a ALB 
+Labmda Target Group, simply swap it out for `gateway.ListenAndServe`.
 
 ```go
 package main
@@ -11,7 +12,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/apex/gateway"
+	"github.com/getas/alb-gateway"
 	"github.com/aws/aws-lambda-go"
 )
 
@@ -22,21 +23,17 @@ func main() {
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	// example retrieving values from the api gateway proxy request context.
-	requestContext, ok := gateway.RequestContext(r.Context())
-	if !ok || requestContext.Authorizer["sub"] == nil {
+	_, ok := gateway.RequestContext(r.Context())
+	if !ok {
 		fmt.Fprint(w, "Hello World from Go")
 		return
 	}
 
-	userID := requestContext.Authorizer["sub"].(string)
-	fmt.Fprintf(w, "Hello %s from Go", userID)
+	fmt.Fprintf(w, "Hello %s from Go", r.RemoteAddr)
 }
 ```
 
 ---
 
-[![GoDoc](https://godoc.org/github.com/apex/up-go?status.svg)](https://godoc.org/github.com/apex/gateway)
 ![](https://img.shields.io/badge/license-MIT-blue.svg)
 ![](https://img.shields.io/badge/status-stable-green.svg)
-
-<a href="https://apex.sh"><img src="http://tjholowaychuk.com:6000/svg/sponsor"></a>
