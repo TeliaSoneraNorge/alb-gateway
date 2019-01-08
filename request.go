@@ -3,17 +3,16 @@ package gateway
 import (
 	"context"
 	"encoding/base64"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/pkg/errors"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-
-	"github.com/getas/alb-gateway/events"
-	"github.com/pkg/errors"
 )
 
 // NewRequest returns a new http.Request from the given Lambda event.
-func NewRequest(ctx context.Context, e events.LambdaTargetGroupRequest) (*http.Request, error) {
+func NewRequest(ctx context.Context, e events.ALBTargetGroupRequest) (*http.Request, error) {
 	// path
 	u, err := url.Parse(e.Path)
 	if err != nil {

@@ -5,8 +5,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/getas/alb-gateway/events"
 )
 
 // ListenAndServe is a drop-in replacement for
@@ -18,10 +18,10 @@ func ListenAndServe(addr string, h http.Handler) error {
 		h = http.DefaultServeMux
 	}
 
-	lambda.Start(func(ctx context.Context, e events.LambdaTargetGroupRequest) (events.LambdaTargetGroupResponse, error) {
+	lambda.Start(func(ctx context.Context, e events.ALBTargetGroupRequest) (events.ALBTargetGroupResponse, error) {
 		r, err := NewRequest(ctx, e)
 		if err != nil {
-			return events.LambdaTargetGroupResponse{}, err
+			return events.ALBTargetGroupResponse{}, err
 		}
 
 		w := NewResponse()

@@ -2,15 +2,14 @@ package gateway
 
 import (
 	"context"
-	"testing"
-
-	"github.com/getas/alb-gateway/events"
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/tj/assert"
 	"io/ioutil"
+	"testing"
 )
 
 func TestNewRequest_path(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		Path: "/pets/luna",
 	}
 
@@ -23,7 +22,7 @@ func TestNewRequest_path(t *testing.T) {
 }
 
 func TestNewRequest_method(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		HTTPMethod: "DELETE",
 		Path:       "/pets/luna",
 	}
@@ -35,7 +34,7 @@ func TestNewRequest_method(t *testing.T) {
 }
 
 func TestNewRequest_queryString(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		HTTPMethod: "GET",
 		Path:       "/pets",
 		QueryStringParameters: map[string]string{
@@ -52,7 +51,7 @@ func TestNewRequest_queryString(t *testing.T) {
 }
 
 func TestNewRequest_header(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		HTTPMethod: "POST",
 		Path:       "/pets",
 		Body:       `{ "name": "Tobi" }`,
@@ -83,7 +82,7 @@ func TestNewRequest_header(t *testing.T) {
 }
 
 func TestNewRequest_body(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		HTTPMethod: "POST",
 		Path:       "/pets",
 		Body:       `{ "name": "Tobi" }`,
@@ -99,7 +98,7 @@ func TestNewRequest_body(t *testing.T) {
 }
 
 func TestNewRequest_bodyBinary(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		HTTPMethod:      "POST",
 		Path:            "/pets",
 		Body:            `aGVsbG8gd29ybGQK`,
@@ -116,7 +115,7 @@ func TestNewRequest_bodyBinary(t *testing.T) {
 }
 
 func TestNewRequest_remoteHost(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{
+	e := events.ALBTargetGroupRequest{
 		HTTPMethod: "GET",
 		Path:       "/pets",
 		Headers: map[string]string{
@@ -132,7 +131,7 @@ func TestNewRequest_remoteHost(t *testing.T) {
 }
 
 func TestNewRequest_context(t *testing.T) {
-	e := events.LambdaTargetGroupRequest{}
+	e := events.ALBTargetGroupRequest{}
 	ctx := context.WithValue(context.Background(), "key", "value")
 	r, err := NewRequest(ctx, e)
 	assert.NoError(t, err)
